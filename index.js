@@ -9,17 +9,18 @@ const URL = require("./models/url")
 const urlRoute = require('./routes/url')
 const staticRoute = require('./routes/staticRouter')
 const userRoute = require('./routes/user');
-const {restrictToLoggedinUserOnly, checkAuth,} = require('./middlewares/auth');
+const {checkAuthorization, restrictTo,} = require('./middlewares/auth');
 
 const PORT = 8001;
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false}))
 app.use(cookieParser())
+app.use(checkAuthorization)
 
-app.use("/url", restrictToLoggedinUserOnly, urlRoute)
+app.use("/url", restrictTo(["NORMAL"]), urlRoute)
 app.use("/user", userRoute)
-app.use('/', checkAuth, staticRoute)
+app.use('/', staticRoute)
 
 
 connectToMongoDB('mongodb://127.0.0.1:27017/short-url').then(()=> console.log("MongoDB Connected"))
